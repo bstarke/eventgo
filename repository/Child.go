@@ -1,4 +1,4 @@
-package attendees
+package repository
 
 import (
 	"github.com/jinzhu/gorm"
@@ -7,7 +7,7 @@ import (
 
 type Child struct {
 	gorm.Model
-	FirstName string		`gorm:"size:100"`
+	FirstName   string		`gorm:"size:100"`
 	DateOfBirth time.Time
-	Guardian Guardian
+	Guardian    Guardian
 }

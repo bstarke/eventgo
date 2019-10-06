@@ -1,4 +1,4 @@
-package attendees
+package repository
 import (
 	"github.com/jinzhu/gorm"
 )
