@@ -22,6 +22,11 @@ func (e Event) FindById(id int64) (event Event) {
 	return
 }
 
+func (e Event) FindActive() (event Event) {
+	db.Where("active = ?", true).First(&event)
+	return
+}
+
 func (e Event) Create(newEvent *Event) (event Event){
 	db.Create(&newEvent)
 	event = *newEvent

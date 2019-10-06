@@ -22,10 +22,11 @@ func main() {
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/events", allEvents)
+	myRouter.HandleFunc("/", homePage).Methods(http.MethodGet)
+	myRouter.HandleFunc("/events", allEvents).Methods(http.MethodGet)
 	myRouter.HandleFunc("/events", createEvent).Methods(http.MethodPost)
-	myRouter.HandleFunc("/events/{id}", eventById)
+	myRouter.HandleFunc("/events/active", eventByActive).Methods(http.MethodGet)
+	myRouter.HandleFunc("/events/{id}", eventById).Methods(http.MethodGet)
 	log.Fatal(http.ListenAndServe(":8080", myRouter))
 }
 
@@ -37,6 +38,11 @@ func homePage(w http.ResponseWriter, r *http.Request){
 func allEvents(w http.ResponseWriter, r *http.Request) {
 	events := repository.Event{}.FindAll()
 	_ = json.NewEncoder(w).Encode(&events)
+}
+
+func eventByActive(w http.ResponseWriter, r *http.Request) {
+	var event = repository.Event{}.FindActive()
+	_ = json.NewEncoder(w).Encode(&event)
 }
 
 func eventById(w http.ResponseWriter, r *http.Request) {
