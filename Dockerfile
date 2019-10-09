@@ -3,19 +3,18 @@ ARG goVersion=1.12
 
 # build stage
 FROM hub.docker.prod.walmart.com/library/golang:${goVersion}-alpine3.10 AS build-env
+
 WORKDIR /go/src/eventgo
+
 COPY . .
+
 RUN echo "http://repository.walmart.com/content/repositories/alpine-v310/main" > /etc/apk/repositories && \
-    echo "http://repository.walmart.com/content/repositories/alpine-v310/community" > /etc/apk/repositories && \
-    apk update
-
-RUN apk add git
-
-RUN export GIT_COMMIT=$(git rev-list -1 HEAD) && \
-    export GO_VERSION=$(go version | awk '{ print $3 }') && \
-    export BUILD_TIME=$(date --rfc-2822)
-
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags="-w -s -X main.GitHash=$GIT_COMMIT -X main.BuildTime=$BUILD_TIME -X main.GoVer=$GO_VERSION" -o app
+    echo "http://repository.walmart.com/content/repositories/alpine-v310/community" >> /etc/apk/repositories && \
+    apk update && \
+    apk add git && \
+    export GIT_COMMIT=$(git rev-list -1 HEAD) && \
+    export BUILD_TIME=$(date +%s) && \
+    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags="-X main.GitHash=$GIT_COMMIT -X main.GoVer=$GOLANG_VERSION -X main.BuildTime=$BUILD_TIME -w -s" -o app
 
 #Non Root User Configuration
 RUN addgroup -S -g 10001 appGrp \

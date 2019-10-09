@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 var version Version
@@ -27,7 +28,12 @@ type Version struct {
 }
 
 func main() {
-	version = Version{GitCommit: GitHash, ApiVersion: "1.0.0", BuildDate: BuildTime, GoVersion: GoVer}
+	i, err := strconv.ParseInt(BuildTime, 10, 64)
+	if err != nil {
+		log.Fatalf("Failed to parse time string: %v", err)
+	}
+	tm := time.Unix(i, 0)
+	version = Version{GitCommit: GitHash, ApiVersion: "1.0.0", BuildDate: tm.Format(time.RFC3339), GoVersion: GoVer}
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {

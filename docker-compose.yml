@@ -12,14 +12,11 @@ services:
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: "events"
 
-#  events:
-#    image: eventgo
-#    depends_on:
-#    - events-db
-#    ports:
-#    - 80:8080
-#    environment:
-#      GORM_CONNSTR: "${DATABASE_USER}:${DATABASE_PASSWORD}@(events-db)/events?charset=utf8&parseTime=True&loc=Local"
-
-
-#docker pull hub.docker.prod.walmart.com/library/golang:1.12-alpine3.10
+  events:
+    image: eventgo
+    depends_on:
+    - events-db
+    ports:
+    - 80:8080
+    environment:
+      GORM_CONNSTR: "${DATABASE_USER}:${DATABASE_PASSWORD}@(events-db)/events?charset=utf8&parseTime=True&loc=Local"
