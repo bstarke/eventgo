@@ -14,7 +14,20 @@ import (
 	"syscall"
 )
 
+var version Version
+var GitHash string
+var BuildTime string
+var GoVer string
+
+type Version struct {
+	GitCommit  string
+	ApiVersion string
+	GoVersion  string
+	BuildDate  string
+}
+
 func main() {
+	version = Version{GitCommit: GitHash, ApiVersion: "1.0.0", BuildDate: BuildTime, GoVersion: GoVer}
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -41,7 +54,7 @@ func handleRequests() {
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
-	_, _ = fmt.Fprintf(w, "Welcome to the HomePage!")
+	_ = json.NewEncoder(w).Encode(&version)
 	fmt.Println("Endpoint Hit: homePage")
 }
 
