@@ -20,7 +20,7 @@ func InitDB() {
 		fmt.Printf("failed to connect database: %v", err)
 		panic("failed to connect database")
 	}
-	db.LogMode(true)
+	//db.LogMode(true)
 
 	// Migrate the schema
 	db.AutoMigrate(&Event{})

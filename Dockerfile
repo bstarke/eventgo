@@ -8,9 +8,7 @@ WORKDIR /go/src/eventgo
 
 COPY . .
 
-RUN echo "http://repository.walmart.com/content/repositories/alpine-v310/main" > /etc/apk/repositories && \
-    echo "http://repository.walmart.com/content/repositories/alpine-v310/community" >> /etc/apk/repositories && \
-    apk update && \
+RUN apk update && \
     apk add git && \
     export GIT_COMMIT=$(git rev-list -1 HEAD) && \
     export BUILD_TIME=$(date --utc +%FT%TZ) && \
@@ -20,19 +18,6 @@ RUN echo "http://repository.walmart.com/content/repositories/alpine-v310/main" >
 RUN addgroup -S -g 10001 appGrp \
     && adduser -S -D -u 10000 -s /sbin/nologin -h /app -G appGrp app \
     && chown -R 10000:10001 /app
-
-# test stage
-#FROM build-env as test
-#RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test ./... -coverprofile cover.out -json > report.json
-
-#sonar
-#FROM docker.prod.walmart.com/strati/docker-sonarqube-scanner:${scannerVersion} as sonar
-#ARG goSourceDir
-#ARG sonarOpts
-#ARG sonarProjKey
-#COPY --from=test ${goSourceDir} /app
-#WORKDIR /app
-#RUN sonar-scanner --debug -Dsonar.projectKey=${sonarProjKey} ${sonarOpts}
 
 # final stage
 FROM scratch

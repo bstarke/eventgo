@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"eventgo/repository"
 	"fmt"
-	"github.com/gorilla/mux"
-	"io/ioutil"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
@@ -42,61 +40,52 @@ func main() {
 }
 
 func handleRequests() {
-	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.Use(commonMiddleware)
-	myRouter.HandleFunc("/", homePage).Methods(http.MethodGet)
-	myRouter.HandleFunc("/events", allEvents).Methods(http.MethodGet)
-	myRouter.HandleFunc("/events", createEvent).Methods(http.MethodPost)
-	myRouter.HandleFunc("/events/active", eventByActive).Methods(http.MethodGet)
-	myRouter.HandleFunc("/events/{id}", eventById).Methods(http.MethodGet)
-	myRouter.HandleFunc("/events/{id}", updateEvent).Methods(http.MethodPut, http.MethodPatch)
-	log.Fatal(http.ListenAndServe(":8080", myRouter))
+	r := gin.Default()
+	//r.Use(commonMiddleware)
+	r.GET("/", homePage)
+	r.GET("/events", allEvents)
+	r.POST("/events", createEvent)
+	r.GET("/events/active", eventByActive)
+	r.GET("/events/:id", eventById)
+	r.PUT("/events/:id", updateEvent)
+	r.PATCH("/events/:id", updateEvent)
+	log.Fatal(r.Run(":8080"))
 }
 
-func homePage(w http.ResponseWriter, r *http.Request) {
-	_ = json.NewEncoder(w).Encode(&version)
+func homePage(c *gin.Context) {
+	c.JSON(http.StatusOK, &version)
 	fmt.Println("Endpoint Hit: homePage")
 }
 
-func allEvents(w http.ResponseWriter, r *http.Request) {
+func allEvents(c *gin.Context) {
 	events := repository.Event{}.FindAll()
-	_ = json.NewEncoder(w).Encode(&events)
+	c.JSON(http.StatusOK, &events)
 }
 
-func eventByActive(w http.ResponseWriter, r *http.Request) {
+func eventByActive(c *gin.Context) {
 	var event = repository.Event{}.FindActive()
-	_ = json.NewEncoder(w).Encode(&event)
+	c.JSON(http.StatusOK, &event)
 }
 
-func eventById(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	key := vars["id"]
+func eventById(c *gin.Context) {
+	key := c.Param("id")
 	id, _ := strconv.Atoi(key)
 	event := repository.Event{}.FindById(uint(id))
-	_ = json.NewEncoder(w).Encode(&event)
+	c.JSON(http.StatusOK, &event)
 }
 
-func createEvent(w http.ResponseWriter, r *http.Request) {
-	reqBody, _ := ioutil.ReadAll(r.Body)
+func createEvent(c *gin.Context) {
 	var event repository.Event
-	_ = json.Unmarshal(reqBody, &event)
-	repository.Event{}.Create(&event)
-	_ = json.NewEncoder(w).Encode(&event)
+	if c.ShouldBind(&event) == nil {
+		repository.Event{}.Create(&event)
+	}
+	c.JSON(http.StatusOK, &event)
 }
 
-func updateEvent(w http.ResponseWriter, r *http.Request) {
-	reqBody, _ := ioutil.ReadAll(r.Body)
+func updateEvent(c *gin.Context) {
 	var event map[string]interface{}
-	_ = json.Unmarshal(reqBody, &event)
-	vars := mux.Vars(r)
-	uId, _ := strconv.Atoi(vars["id"])
+	c.BindJSON(&event)
+	uId, _ := strconv.Atoi(c.Param("id"))
 	nEvent, _ := repository.Event{}.PatchUpdate(uint(uId), event)
-	_ = json.NewEncoder(w).Encode(&nEvent)
-}
-
-func commonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
+	c.JSON(http.StatusOK, &nEvent)
 }
