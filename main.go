@@ -53,8 +53,8 @@ func handleRequests() {
 }
 
 func homePage(c *gin.Context) {
-	c.JSON(http.StatusOK, &version)
 	fmt.Println("Endpoint Hit: homePage")
+	c.JSON(http.StatusOK, &version)
 }
 
 func allEvents(c *gin.Context) {

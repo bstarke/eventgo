@@ -21,7 +21,7 @@ RUN addgroup -S -g 10001 appGrp \
 
 # final stage
 FROM scratch
-LABEL maintainer="Walmart Container Engineering"
+LABEL maintainer="Brad Starkenberg"
 # Import the user and group files from the builder.
 COPY --from=build-env /etc/passwd /etc/passwd
 COPY --from=build-env /go/src/eventgo/app .

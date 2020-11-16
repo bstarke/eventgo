@@ -9,9 +9,11 @@ import (
 	"time"
 )
 
-var db *gorm.DB
-var err error
-var deleteOnExit bool
+var (
+	db *gorm.DB
+	err error
+	deleteOnExit bool
+)
 
 func InitDB() {
 	time.Sleep(15 * time.Second) //give MySql time to start up
