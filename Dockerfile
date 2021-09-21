@@ -1,8 +1,5 @@
-ARG goVersion=1.12
-#ARG scannerVersion=0.0.14
-
 # build stage
-FROM hub.docker.prod.walmart.com/library/golang:${goVersion}-alpine3.10 AS build-env
+FROM golang:1.17-alpine3.14 AS build-env
 
 WORKDIR /go/src/eventgo
 
@@ -12,7 +9,7 @@ RUN apk update && \
     apk add git && \
     export GIT_COMMIT=$(git rev-list -1 HEAD) && \
     export BUILD_TIME=$(date --utc +%FT%TZ) && \
-    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags="-X main.GitHash=$GIT_COMMIT -X main.GoVer=$GOLANG_VERSION -X main.BuildTime=$BUILD_TIME -w -s" -o app
+    GOOS=linux CGO_ENABLED=0 go build -a -installsuffix cgo -ldflags="-X main.GitHash=$GIT_COMMIT -X main.GoVer=$GOLANG_VERSION -X main.BuildTime=$BUILD_TIME -w -s" -o app
 
 #Non Root User Configuration
 RUN addgroup -S -g 10001 appGrp \
