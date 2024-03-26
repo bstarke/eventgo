@@ -84,7 +84,11 @@ func createEvent(c *gin.Context) {
 
 func updateEvent(c *gin.Context) {
 	var event map[string]interface{}
-	c.BindJSON(&event)
+	err := c.BindJSON(&event)
+	if err != nil {
+		log.Printf("Error Binding JSON.. haha %s", err.Error())
+		return
+	}
 	uId, _ := strconv.Atoi(c.Param("id"))
 	nEvent, _ := repository.Event{}.PatchUpdate(uint(uId), event)
 	c.JSON(http.StatusOK, &nEvent)

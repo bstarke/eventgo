@@ -4,6 +4,8 @@
 *.dll
 *.so
 *.dylib
+
+bin/
 eventgo
 events.db
 

@@ -1,9 +1,7 @@
 version: '3.1'
-
 services:
-
   events-db:
-    image: mariadb
+    image: harbor.home.starkenberg.net/hub/library/mariadb
     ports:
     - 3306:3306
     environment:
@@ -11,9 +9,9 @@ services:
       MYSQL_USER: ${DATABASE_USER}
       MYSQL_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: "events"
-
   events:
-    image: eventgo
+    build: .
+    image: harbor.home.starkenberg.net/library/eventgo
     depends_on:
     - events-db
     ports:
