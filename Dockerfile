@@ -1,5 +1,5 @@
 # build stage
-FROM harbor.home.starkenberg.net/hub/golang:1.22 AS build-env
+FROM golang:1.22 AS build-env
 
 WORKDIR /go/src/eventgo
 
